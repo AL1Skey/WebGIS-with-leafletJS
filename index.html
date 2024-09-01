@@ -1,32 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <!-- Measure Widget CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-measure/dist/leaflet-measure.css"
+    />
+    <!-- Find Location Widget CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css"
+    />
+    <!-- Search Widget CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css"
+    />
+    <!-- Full Screen Widget -->
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css"
+    />
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
     <!-- Custom CSS -->
     <style>
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
+      #map {
+        height: 50vh;
+        width: 50%;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="map"></div>
-</body>
+  </body>
 </html>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<!-- Full Screen Widget JS -->
+<script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
+
+<!-- Search Widget JS -->
+<script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
+
+<!-- Find Location Widget -->
+<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+
+<!-- Measure Widget JS -->
+<script src="https://unpkg.com/leaflet-measure/dist/leaflet-measure.js"></script>
+
+<!-- Legend Widget JS -->
+<script src="Leaflet.Legend/src/leaflet.legend.js"></script>
 
 <script>
-    var map = L.map('map').setView([ -0.789275, 113.921327], 5);
 
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Map Initialization
+    // Syntax:
+    // L.map('map').setView([latitude, longitude], zoom)
+    var map = L.map("map").setView([-0.789275, 113.921327], 5);
+
+    // Add Full Screen Widget
+    map.addControl(new L.Control.Fullscreen());
+
+    // Memindahkan tombol zoom ke kanan atas
+    map.zoomControl.setPosition("topright");
+
+    // Menghapus kontrol zoom
+    // map.removeControl(map.zoomControl);
+
+    // OSM Layer Initialization
+    var osm = L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
         maxZoom: 19,
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        attribution:
+          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      }
+    ).addTo(map);
+
+    // Marker Initialization
+    // Syntax:
+    // L.marker([latitude, longitude]).addTo(map)
+    var marker = L.marker([-0.789275, 113.921327]).addTo(map);
+
+    // Menambahkan Search Feature
+    var searchControl = new L.Control.Search({
+      layer: marker, // Anda dapat mencari berdasarkan marker
+      initial: false,
+      zoom: 14,
+    });
+
+    map.addControl(searchControl);
+
+    // Menambahkan Find Location Feature
+    L.control.locate().addTo(map);
+
+    // Menambahkan Measure Feature
+    L.control
+      .measure({
+        position: "topright",
+        primaryLengthUnit: "meters",
+        primaryAreaUnit: "sqmeters",
+        activeColor: "#FF0000",
+        completedColor: "#00FF00",
+      })
+      .addTo(map);
+
+    // Add marker popup
+    marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+
+    // Menambahkan beberapa tile layer
+    var streets = L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap contributors",
+      }
+    );
+
+    var satellite = L.tileLayer(
+      "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 17,
+        attribution: "Map data: &copy; OpenTopoMap contributors",
+      }
+    );
+
+    // Menambahkan layer control untuk basemap
+    var baseMaps = {
+      Streets: streets,
+      Satellite: satellite,
+    };
+
+    L.control.layers(baseMaps).addTo(map);
+
+
+    // Membuat Legends
+    var latlngs = [
+        [
+            29.204918463909035,
+            119.6246337890625,
+        ],
+        [
+            29.79358002272772,
+            120.27008056640624,
+        ],
+        [
+            29.70087695780884,
+            120.2984046936035,
+        ]
+    ];
+    var polyline = L.polyline(latlngs, {
+        color: 'red'
     }).addTo(map);
+
+    const legend = L.control.Legend({
+            position: "bottomleft",
+            collapsed: false,
+            symbolWidth: 24,
+            opacity: 1,
+            column: 2,
+            legends: [{
+                label: "Real line",
+                type: "polyline",
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2,
+                layers: polyline
+            }]
+        })
+        .addTo(map);
+
+
+    //     // Add circle marker
+    //     var circle = L.circle([-1.789275, 113.921327], {
+    //     color: 'red',
+    //     fillColor: '#f03',
+    //     fillOpacity: 0.5,
+    //     radius: 500
+    // }).addTo(map);
+
+    // // Add polygon
+    // var polygon = L.polygon([
+    //     [51.509, -0.08],
+    //     [51.503, -0.06],
+    //     [51.51, -0.047]
+    // ]).addTo(map);
+  ;
 </script>
